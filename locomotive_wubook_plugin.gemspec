@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.summary     = "Integrates some of the WuBooks 'Wired' interface."
   s.licenses    = ['Private']
 
-  s.add_dependency 'locomotive_plugins',    '~> 1.0'
+  s.add_dependency 'locomotive_plugins',    '~> 1.2'
 
   s.add_development_dependency 'rspec',     '~> 2.12'
   s.add_development_dependency 'mocha',     '~> 0.13'

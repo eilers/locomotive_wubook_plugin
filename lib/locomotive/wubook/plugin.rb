@@ -17,7 +17,7 @@ module Locomotive
       before_page_render :authenticate_if_needed
 
       def self.default_plugin_id
-        'basic_auth'
+        'wubook'
       end
 
       def config_template_file
