@@ -1,0 +1,12 @@
+{
+	"folders":
+	[
+		{
+			"folder_exclude_patterns":
+			[
+			],
+			"file_exclude_patterns": ["*.orig", "*.sublime-*"],
+			"path": "./"
+		}
+	]
+}
