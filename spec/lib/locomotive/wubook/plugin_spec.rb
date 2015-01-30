@@ -2,6 +2,39 @@ require 'spec_helper'
 
 module Locomotive
   module WuBook
+    describe Wired do
+      let(:config) { Hash.new }
+
+      let(:wired) { Wired.new({ 'account_code' => 'SE016', 'password' => '59595', 'provider_key' => 'stfeltt39qt777'}) }
+
+      before(:each) do
+      end
+
+      it 'should return a valid (mocked) config' do
+        expect(wired.config).not_to be_nil
+        expect(wired.config).to have_key('account_code')
+        expect(wired.config).to have_key('password')
+        expect(wired.config).to have_key('provider_key')
+      end
+
+      it 'should decode the error values' do
+        expect(wired.decode_error(0)).to match ('Ok')
+        expect(wired.decode_error(-1)).to match ('Authentication Failed')
+      end
+
+      it 'should aquire a token, validate it and return it afterwards' do
+        token = wired.aquire_token
+        expect(token).not_to be_nil
+
+        expect(wired.is_token_valid(token)).to be_truthy
+
+        wired.release_token(token)
+        
+        expect(wired.is_token_valid(token)).to be_falsey
+      end
+
+    end
+
     describe Plugin do
 
       let(:config) { Hash.new }
@@ -9,39 +42,12 @@ module Locomotive
       let(:plugin) { Plugin.new }
 
       before(:each) do
-        plugin.stubs(:fullpath => 'my_dir/my_path')
-        plugin.stubs(:config).returns(config)
       end
 
       it 'should authenticate if the page path matches the regex' do
-        set_regex_string('my_dir/.*')
-        plugin.expects(:authenticate)
-        plugin.authenticate_if_needed
-      end
-
-      it 'should not authenticate if the page path matches the regex' do
-        set_regex_string('other_path')
-        plugin.expects(:authenticate).never
-        plugin.authenticate_if_needed
-      end
-
-      it 'should not match the entire string against the regex by default' do
-        set_regex_string('my_dir')
-        plugin.expects(:authenticate)
-        plugin.authenticate_if_needed
-      end
-
-      it 'should match the entire string if the regex has beginning and ending markers' do
-        set_regex_string('^my_dir/.*$')
-        plugin.expects(:authenticate)
-        plugin.authenticate_if_needed
       end
 
       protected
-
-      def set_regex_string(str)
-        config['fullpath_regex'] = str
-      end
 
     end
   end
