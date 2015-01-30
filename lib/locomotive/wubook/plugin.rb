@@ -43,9 +43,19 @@ module Locomotive
         status = response[0]
         if (is_error(status)) 
           error_message = decode_error(status)
-          data   = response[1]
-          raise "Unable to release token. Reason: #{error_message}, Message: #{data}"
+          message = response[1]
+          raise "Unable to release token. Reason: #{error_message}, Message: #{message}"
         end
+      end
+
+      def fetch_rooms(token, lcode)
+        response = server.call("fetch_rooms", token, lcode)
+        status = response[0]
+        data   = response[1]
+        if (is_error(status)) 
+          raise "Unable to fetch room data. Reason: #{error_message}, Message: #{data}"
+        end
+        data
       end
 
       def decode_error(code)

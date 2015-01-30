@@ -29,8 +29,14 @@ module Locomotive
         expect(wired.is_token_valid(token)).to be_truthy
 
         wired.release_token(token)
-        
+
         expect(wired.is_token_valid(token)).to be_falsey
+      end
+
+      it 'returns a list of rooms' do
+        token = wired.aquire_token
+        rooms = wired.fetch_rooms(token, "1422356463")
+        expect(rooms).not_to be_nil
       end
 
     end
