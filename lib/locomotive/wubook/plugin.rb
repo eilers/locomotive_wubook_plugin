@@ -5,12 +5,17 @@ require 'xmlrpc/client'
 
 require 'locomotive_plugins'
 
-# This is a quick-and-dirty basic authentication plugin. The login string and
-# password are stored in plaintext in the config hash, so it is not secure. The
-# configuration also takes a regular expression which specifies the page
-# fullpaths which require basic authentication
+class XMLRPC::Client
+  def set_debug
+    @http.set_debug_output($stderr);
+  end
+end
+
 module Locomotive
   module WuBook
+
+    # Implementation of the WuBook API. 
+    # The Documentation can be found here: https://sites.google.com/site/wubookdocs/wired/wired-pms-xml
     class Wired
       def initialize(config)
         # The config will contain the following keys: account_code, password, provider_key
@@ -21,39 +26,73 @@ module Locomotive
         @config
       end
 
+      # Requests a token from the server. 
+      # The token is stored in this object and will be used automatically.
       def aquire_token
         token_data = server.call("acquire_token", @config['account_code'], @config['password'], @config['provider_key'])
         status = token_data[0]
-        data   = token_data[1]
+        @token = token_data[1]
         if (is_error(status)) 
           error_message = decode_error(status)
           raise "Unable to aquire token. Reason: #{error_message}, Message: #{data}"
         end
-        data
+        @token
       end
 
-      def is_token_valid(token)
+      def is_token_valid(token = @token)
         response = server.call("is_token_valid", token)
         status = response[0]
         status == 0
       end
 
-      def release_token(token)
+      # Releases the token fetched by #aquire_token
+      def release_token(token = @token)
         response = server.call("release_token", token)
-        status = response[0]
-        if (is_error(status)) 
-          error_message = decode_error(status)
-          message = response[1]
-          raise "Unable to release token. Reason: #{error_message}, Message: #{message}"
-        end
+
+        handle_response(response, "Unable to release token")
+        @token = nil
       end
 
-      def fetch_rooms(token, lcode)
+      # Fetch rooms
+      def fetch_rooms(lcode, token = @token)
         response = server.call("fetch_rooms", token, lcode)
+
+        handle_response(response, "Unable to fetch room data")
+      end
+
+      # Update room values
+      # ==== Attributes
+      # * +dfrom+ - A Ruby date object (start date)
+      # * +rooms+ - A hash with the following structure: [{'id' => room_id, 'days' => [{'avail' => 0}, {'avail' => 1}]}]
+      def update_rooms_values(lcode, dfrom, rooms, token = @token)
+        response = server.call("update_rooms_values", token, lcode, dfrom.strftime('%d/%m/%Y'), rooms)
+
+        handle_response(response, "Unable to update room data")
+      end
+
+      # Request data about rooms.
+      # ==== Attributes
+      # * +dfrom+ - A Ruby date object (start date)
+      # * +dto+ - A Ruby date object (end date)
+      # * +rooms+ - A hash with the following structure: [{'id' >= room_id}]
+      def fetch_room_values(lcode, dfrom, dto, rooms = nil, token = @token)
+        if rooms != nil then
+          response = server.call("fetch_rooms_values", token, lcode, dfrom.strftime('%d/%m/%Y'), dto.strftime('%d/%m/%Y'), rooms)
+        else
+          response = server.call("fetch_rooms_values", token, lcode, dfrom.strftime('%d/%m/%Y'), dto.strftime('%d/%m/%Y'))
+        end
+        
+        handle_response(response, "Unable to fetch room values")
+      end
+
+      protected
+
+      def handle_response(response, error_message)
         status = response[0]
         data   = response[1]
         if (is_error(status)) 
-          raise "Unable to fetch room data. Reason: #{error_message}, Message: #{data}"
+          error_message = decode_error(status)
+          raise "#{error_message}. Reason: #{error_message}, Message: #{data}"
         end
         data
       end
@@ -90,10 +129,10 @@ module Locomotive
         codes[code]
       end
 
-      protected
-
       def server
-        XMLRPC::Client.new2("https://wubook.net/xrws/")
+        server = XMLRPC::Client.new2 ("https://wubook.net/xrws/")
+        #server.set_debug
+        server
       end
 
 
