@@ -50,7 +50,7 @@ module Locomotive
         wired.update_rooms_values("1422356463", Date.tomorrow, test_data)
 
         # Check whether change worked. 
-        room_values = wired.fetch_room_values("1422356463", Date.today, Date.tomorrow)
+        room_values = wired.fetch_rooms_values("1422356463", Date.today, Date.tomorrow)
 
         room_values_for_changed_room = room_values[room_id.to_s]
 
@@ -63,7 +63,7 @@ module Locomotive
         wired.update_rooms_values("1422356463", Date.tomorrow, test_data)
 
         # And check whether the cleanup worked.
-        room_values = wired.fetch_room_values("1422356463", Date.today, Date.tomorrow)
+        room_values = wired.fetch_rooms_values("1422356463", Date.today, Date.tomorrow, [room_id])
         room_values_for_changed_room = room_values[room_id.to_s]
         expect(room_values_for_changed_room[0]['avail']).to eq(1)
         expect(room_values_for_changed_room[1]['avail']).to eq(1)

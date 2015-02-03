@@ -74,8 +74,8 @@ module Locomotive
       # ==== Attributes
       # * +dfrom+ - A Ruby date object (start date)
       # * +dto+ - A Ruby date object (end date)
-      # * +rooms+ - A hash with the following structure: [{'id' >= room_id}]
-      def fetch_room_values(lcode, dfrom, dto, rooms = nil, token = @token)
+      # * +rooms+ - An array containing the requested room ids
+      def fetch_rooms_values(lcode, dfrom, dto, rooms = nil, token = @token)
         if rooms != nil then
           response = server.call("fetch_rooms_values", token, lcode, dfrom.strftime('%d/%m/%Y'), dto.strftime('%d/%m/%Y'), rooms)
         else
