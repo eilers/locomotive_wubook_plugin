@@ -2,6 +2,7 @@
 require 'rubygems'
 require 'bundler/setup'
 require 'xmlrpc/client'
+require 'date'
 
 require 'locomotive_plugins'
 
@@ -166,7 +167,6 @@ module Locomotive
 
     class AvailableDaysBlock < ::Liquid::Tag
       def initialize(tag_name, markup, tokens, context)
-        @plugin_obj = context.registers[:plugin_object]
         @options = {
           room_ident: ''
         }
@@ -176,6 +176,7 @@ module Locomotive
       end
 
       def render(context)
+        @plugin_obj = context.registers[:plugin_object]
         config = @plugin_obj.config
 
         returned_string = "["
@@ -184,22 +185,22 @@ module Locomotive
 
         # Fetch availability data for given room identifier
         # As the room id is not visible in the web interface, we have to find it first. We use the short name as identifier.
-        wired = new Wired(config)
+        wired = Wired.new(config)
         wired.aquire_token
 
         # Start with finding the room-id for the room with a special name
-        rooms = wired.fetch_rooms(@config['lcode'])
+        rooms = wired.fetch_rooms(config['lcode'])
         filtered_rooms = rooms.select { |room_hash| room_hash['shortname'].casecmp @options['room_ident'.to_sym] }
         raise "Unable to find a room with identifier: #{@options['room_ident']}" if filtered_rooms.length == 0
         room_identifier = filtered_rooms[0]['id']
         raise "Unable to get the room id." if room_identifier == nil
 
         # Now we will request the room values. Start will be today with data for the next 2 years
-        wired.fetch_rooms_values(@config['lcode'], Date.today, Date.next_month(config['months_ahead'].to_i * 12), [room_identifier])
+        wired.fetch_rooms_values(config['lcode'], Date.today, Date.today.next_month(config['months_ahead'].to_i * 12), [room_identifier])
         room_values = room_values[room_identifier.to_s]
 
         # Create one entry for each day from now to then.. put a 1 if the day is available or 0 if not.
-        (Date.today..Date.next_month(config['months_ahead'].to_i * 12)).each_with_index do |date, i|
+        (Date.today .. Date.today.next_month(config['months_ahead'].to_i * 12)).each_with_index do |date, i|
           returned_string += "," if i > 0
           returned_string += 1 if room_values[i] === 1 
           returned_string += 0 if room_values[i] === 0
