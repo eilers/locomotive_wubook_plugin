@@ -81,7 +81,7 @@ module Locomotive
         else
           response = server.call("fetch_rooms_values", token, lcode, dfrom.strftime('%d/%m/%Y'), dto.strftime('%d/%m/%Y'))
         end
-        
+
         handle_response(response, "Unable to fetch room values")
       end
 
@@ -99,32 +99,32 @@ module Locomotive
 
       def decode_error(code)
         codes = {
-           0    => 'Ok',
-          -1    => 'Authentication Failed',
-          -2    => 'Invalid Token',
-          -3    => 'Server is busy: releasing tokens is now blocked. Please, retry again later',
-          -4    => 'Token Request: requesting frequence too high',
-          -5    => 'Token Expired',
-          -6    => 'Lodging is not active',
-          -7    => 'Internal Error',
-          -8    => 'Token used too many times: please, create a new token',
-          -9    => 'Invalid Rooms for the selected facility',
-          -10   => 'Invalid lcode',
-          -11   => 'Shortname has to be unique. This shortname is already used',
-          -12   => 'Room Not Deleted: Special Offer Involved',
-          -13   => 'Wrong call: pass the correct arguments, please',
-          -14   => 'Please, pass the same number of days for each room',
-          -15   => 'This plan is actually in use',
-          -100  => 'Invalid Input',
-          -101  => 'Malformed dates or restrictions unrespected',
-          -1000 => 'Invalid Lodging/Portal code',
-          -1001 => 'Invalid Dates',
-          -1002 => 'Booking not Initialized: use facility_request()',
-          -1003 => 'Objects not Available',
-          -1004 => 'Invalid Customer Data',
-          -1005 => 'Invalid Credit Card Data or Credit Card Rejected',
-          -1006 => 'Invalid Iata',
-          -1007 => 'No room was requested: use rooms_request()' 
+         0    => 'Ok',
+         -1    => 'Authentication Failed',
+         -2    => 'Invalid Token',
+         -3    => 'Server is busy: releasing tokens is now blocked. Please, retry again later',
+         -4    => 'Token Request: requesting frequence too high',
+         -5    => 'Token Expired',
+         -6    => 'Lodging is not active',
+         -7    => 'Internal Error',
+         -8    => 'Token used too many times: please, create a new token',
+         -9    => 'Invalid Rooms for the selected facility',
+         -10   => 'Invalid lcode',
+         -11   => 'Shortname has to be unique. This shortname is already used',
+         -12   => 'Room Not Deleted: Special Offer Involved',
+         -13   => 'Wrong call: pass the correct arguments, please',
+         -14   => 'Please, pass the same number of days for each room',
+         -15   => 'This plan is actually in use',
+         -100  => 'Invalid Input',
+         -101  => 'Malformed dates or restrictions unrespected',
+         -1000 => 'Invalid Lodging/Portal code',
+         -1001 => 'Invalid Dates',
+         -1002 => 'Booking not Initialized: use facility_request()',
+         -1003 => 'Objects not Available',
+         -1004 => 'Invalid Customer Data',
+         -1005 => 'Invalid Credit Card Data or Credit Card Rejected',
+         -1006 => 'Invalid Iata',
+         -1007 => 'No room was requested: use rooms_request()' 
         }
         codes[code]
       end
@@ -139,26 +139,76 @@ module Locomotive
       def is_error(code)
         code.to_i < 0
       end
-
     end
 
     class Plugin
-
       include Locomotive::Plugin
-
-      before_page_render :authenticate_if_needed
 
       def self.default_plugin_id
         'wubook'
+      end
+
+      def initialize
+
       end
 
       def config_template_file
         File.join(File.dirname(__FILE__), 'plugin', 'config.haml')
       end
 
+      def self.liquid_tags
+        { :available => AvailableDaysBlock }
+      end
+
       protected
 
     end
 
+    class AvailableDaysBlock < ::Liquid::Tag
+      def initialize(tag_name, markup, tokens, context)
+        @plugin_obj = context.registers[:plugin_object]
+        @options = {
+          room_ident: ''
+        }
+
+        markup.scan(::Liquid::TagAttributes) { |key, value| @options[key.to_sym] = value.gsub(/"|'/, '') }
+        super
+      end
+
+      def render(context)
+        config = @plugin_obj.config
+
+        returned_string = "["
+
+        raise "Missing parameter 'room_ident'" if @options[:room_ident].empty?
+
+        # Fetch availability data for given room identifier
+        # As the room id is not visible in the web interface, we have to find it first. We use the short name as identifier.
+        wired = new Wired(config)
+        wired.aquire_token
+
+        # Start with finding the room-id for the room with a special name
+        rooms = wired.fetch_rooms(@config['lcode'])
+        filtered_rooms = rooms.select { |room_hash| room_hash['shortname'].casecmp @options['room_ident'.to_sym] }
+        raise "Unable to find a room with identifier: #{@options['room_ident']}" if filtered_rooms.length == 0
+        room_identifier = filtered_rooms[0]['id']
+        raise "Unable to get the room id." if room_identifier == nil
+
+        # Now we will request the room values. Start will be today with data for the next 2 years
+        wired.fetch_rooms_values(@config['lcode'], Date.today, Date.next_month(config['months_ahead'].to_i * 12), [room_identifier])
+        room_values = room_values[room_identifier.to_s]
+
+        # Create one entry for each day from now to then.. put a 1 if the day is available or 0 if not.
+        (Date.today..Date.next_month(config['months_ahead'].to_i * 12)).each_with_index do |date, i|
+          returned_string += "," if i > 0
+          returned_string += 1 if room_values[i] === 1 
+          returned_string += 0 if room_values[i] === 0
+        end
+
+        wired.release_token
+
+        returned_string + "]"
+      end
+    end
   end
 end
