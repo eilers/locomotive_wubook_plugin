@@ -196,14 +196,20 @@ module Locomotive
         raise "Unable to get the room id." if room_identifier == nil
 
         # Now we will request the room values. Start will be today with data for the next 2 years
-        wired.fetch_rooms_values(config['lcode'], Date.today, Date.today.next_month(config['months_ahead'].to_i * 12), [room_identifier])
-        room_values = room_values[room_identifier.to_s]
+        room_values = wired.fetch_rooms_values(config['lcode'], Date.today, Date.today.next_month(config['months_ahead'].to_i), [room_identifier])
+        room_data = room_values[room_identifier.to_s]
+        raise "Missing room data from server." if room_data == nil
 
         # Create one entry for each day from now to then.. put a 1 if the day is available or 0 if not.
         (Date.today .. Date.today.next_month(config['months_ahead'].to_i * 12)).each_with_index do |date, i|
           returned_string += "," if i > 0
-          returned_string += 1 if room_values[i] === 1 
-          returned_string += 0 if room_values[i] === 0
+
+          if room_data[i] != nil && room_data[i]['avail'] === 1 
+          then
+            returned_string += "1"
+          else
+            returned_string += "0"  
+          end
         end
 
         wired.release_token
