@@ -88,12 +88,12 @@ module Locomotive
 
       protected
 
-      def handle_response(response, error_message)
+      def handle_response(response, message)
         status = response[0]
         data   = response[1]
         if (is_error(status)) 
           error_message = decode_error(status)
-          raise "#{error_message}. Reason: #{error_message}, Message: #{data}"
+          raise "#{message}. Reason: #{error_message}, Message: #{data}"
         end
         data
       end
