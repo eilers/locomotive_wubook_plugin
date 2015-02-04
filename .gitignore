@@ -1,3 +1,4 @@
 *.gem
 gems
 doc
+*.orig
