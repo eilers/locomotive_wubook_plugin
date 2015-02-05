@@ -114,16 +114,16 @@ module Locomotive
 
         raise "Missing parameter 'date_start'" if @options[:date_start].empty?
         date_start_evaluated = context[@options[:date_start]]
-        @options[:date_start] = date_start_evaluated unless date_start_evaluated.nil? || date_start_evaluated.empty?
+        @options[:date_start] = date_start_evaluated unless date_start_evaluated.nil?
         ::Locomotive.log "**> CheckInterval date_start_evaluated: #{@options[:date_start_evaluated]}"
 
         raise "Missing parameter 'date_end'" if @options[:date_end].empty?
         date_end_evaluated = context[@options[:date_end]]
-        @options[:date_end] = date_end_evaluated unless date_end_evaluated.nil? || date_end_evaluated.empty?
+        @options[:date_end] = date_end_evaluated unless date_end_evaluated.nil?
         ::Locomotive.log "**> CheckInterval date_end: #{@options[:date_end]}"
 
-        start_day = Date.strptime(@options[:date_start], '%d.%m.%Y')
-        last_day  = Date.strptime(@options[:date_end], '%d.%m.%Y')
+        start_day = @options[:date_start]
+        last_day  = @options[:date_end]
         ::Locomotive.log "**> CheckInterval: Date Interval: #{start_day} - #{last_day}"
 
         wired = Wired.new(config)
@@ -184,16 +184,16 @@ module Locomotive
 
         raise "Missing parameter 'date_start'" if @options[:date_start].empty?
         date_start_evaluated = context[@options[:date_start]]
-        @options[:date_start] = date_start_evaluated unless date_start_evaluated.nil? || date_start_evaluated.empty?
+        @options[:date_start] = date_start_evaluated unless date_start_evaluated.nil?
         ::Locomotive.log "**> SetAsBooked date_start_evaluated: #{@options[:date_start_evaluated]}"
 
         raise "Missing parameter 'date_end'" if @options[:date_end].empty?
         date_end_evaluated = context[@options[:date_end]]
-        @options[:date_end] = date_end_evaluated unless date_end_evaluated.nil? || date_end_evaluated.empty?
+        @options[:date_end] = date_end_evaluated unless date_end_evaluated.nil?
         ::Locomotive.log "**> SetAsBooked date_end: #{@options[:date_end]}"
 
-        start_day = Date.strptime(@options[:date_start], '%d.%m.%Y')
-        last_day  = Date.strptime(@options[:date_end], '%d.%m.%Y')
+        start_day = @options[:date_start]
+        last_day  = @options[:date_end]
         ::Locomotive.log "**> SetAsBooked: Date Interval: #{start_day} - #{last_day}"
 
         wired = Wired.new(config)
