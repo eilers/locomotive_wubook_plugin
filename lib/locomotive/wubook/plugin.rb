@@ -85,7 +85,7 @@ module Locomotive
       end
 
       def render_disabled(context)
-        "Locomotive_wubook_plugin is disabled!"
+        "[]"
       end
     end
 
@@ -115,7 +115,7 @@ module Locomotive
         raise "Missing parameter 'date_start'" if @options[:date_start].empty?
         date_start_evaluated = context[@options[:date_start]]
         @options[:date_start] = date_start_evaluated unless date_start_evaluated.nil?
-        ::Locomotive.log "**> CheckInterval date_start_evaluated: #{@options[:date_start_evaluated]}"
+        ::Locomotive.log "**> CheckInterval date_start_evaluated: #{@options[:date_start]}"
 
         raise "Missing parameter 'date_end'" if @options[:date_end].empty?
         date_end_evaluated = context[@options[:date_end]]
@@ -155,7 +155,7 @@ module Locomotive
       end
 
       def render_disabled(context)
-        "Locomotive_wubook_plugin is disabled!"
+        "Ok"
       end
     end
 
@@ -217,7 +217,7 @@ module Locomotive
       end
 
       def render_disabled(context)
-        "Locomotive_wubook_plugin is disabled!"
+        "<!-- Locomotive_wubook_plugin is disabled! -->"
       end
     end
   end
