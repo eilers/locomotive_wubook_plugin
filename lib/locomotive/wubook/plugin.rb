@@ -99,6 +99,7 @@ module Locomotive
       end
 
       def render(context)
+        ::Locomotive.log "**> context: #{context.inspect}"
         @plugin_obj = context.registers[:plugin_object]
         config = @plugin_obj.config
 
