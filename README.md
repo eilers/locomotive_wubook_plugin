@@ -13,7 +13,7 @@ app](http://doc.locomotivecms.com/guides/get-started/install-engine), ensuring
 you have all of the [Requirements](http://doc.locomotivecms.com/guides/get-started/requirements) installed, and add your
 plugin gem to the app's Gemfile in the `locomotive_plugins` group:
 
-    group(:locomotive_plugins) do
+     group(:locomotive_plugins) do
       gem 'locomotive_wubook_plugin'
       gem 'another_plugin'
     end
@@ -37,24 +37,39 @@ No liquid drops are provided
 ### Liquid Tags
 
 There are three tags implemented:
-* wubook_available: Returns a JSON array that contains one entry for each day of the time interval defined with "Booking months ahead", starting with today. 1 means that the room is available for this day. 0 means: Not available.
+#### wubook_available
+Returns a JSON array that contains one entry for each day of the time interval defined with "Booking months ahead", starting with today. 1 means that the room is available for this day. 0 means: Not available.
     - room_ident: The short name of the room as defined in WuBook
+
 Example:
-    {% wubook_available room_ident: 'TestRoom' %};
+
+  	{% wubook_available room_ident: 'TestRoom' %};
 Returns
+    
     [1,0,0,1]
+
 Which means: Available today, not for today + 1 and not for today + 2 ..
-* wubook_setAsBooked: Set a given date range as not available (booked). *Note:*  We will not do any booking here. We will only set the availability of the given room to 0.
+####wubook_setAsBooked
+Set a given date range as not available (booked). *Note:*  We will not do any booking here. We will only set the availability of the given room to 0.
     - room_ident: The short name of the room as defined in WuBook
     - date_start: The day of arrival.
     - date_end: The day of departure.
+
 Example:
+    
     {% wubook_setAsBooked room_ident:lastBuchung.wubook_room_id date_start: lastBuchung.anreise date_end: lastBuchung.abreise %}
-* wubook_checkInterval - Checks whether the given interval is available. *Note:* this tag accepts overlapping arrival and departure days.
+
+####wubook_checkInterval
+Checks whether the given interval is available. *Note:* this tag accepts overlapping arrival and departure days.
+
 Example:
-    {% wubook_checkInterval room_ident:lastBuchung.wubook_room_id date_start: lastBuchung.anreise date_end: lastBuchung.abreise %}
+   
+	{% wubook_checkInterval room_ident:lastBuchung.wubook_room_id date_start: lastBuchung.anreise date_end: lastBuchung.abreise %}
 Returns:
-    "Ok" if the booking time frame is available.
+    
+	"Ok" 
+    
+if the booking time frame is available.
 
 ### Liquid Filters
 

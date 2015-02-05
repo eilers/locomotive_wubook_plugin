@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
 
   s.authors     = ["Stefan Eilers"]
   s.email       = "se@intelligentmobiles.com"
-  s.homepage    = "http://www.intelligentmobiles.com"
+  s.homepage    = "https://github.com/eilers/locomotive_wubook_plugin"
   s.description = "Locomotive plugin for accessing WuBook.net channel manager"
   s.summary     = "Integrates some of the WuBooks 'Wired' interface."
   s.licenses    = ['Private']
