@@ -79,6 +79,10 @@ module Locomotive
 
         returned_string + "]"
       end
+
+      def render_disabled(context)
+        "Locomotive_wubook_plugin is disabled!"
+      end
     end
 
     class CheckInterval < ::Liquid::Tag
@@ -133,6 +137,10 @@ module Locomotive
 
         is_available ? "Ok" : "Err"
       end
+
+      def render_disabled(context)
+        "Locomotive_wubook_plugin is disabled!"
+      end
     end
 
     # This tag sets the availability of the given days to 0 (false)
@@ -181,6 +189,9 @@ module Locomotive
         "<!-- Availability was set to 0 for room #{@options[:room_ident]} from #{@options[:date_start]} to #{@options[:date_end]} -->"
       end
 
+      def render_disabled(context)
+        "Locomotive_wubook_plugin is disabled!"
+      end
     end
   end
 end
