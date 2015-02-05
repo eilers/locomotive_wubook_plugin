@@ -53,7 +53,10 @@ module Locomotive
 
         returned_string = "["
 
+        # Evaluate variables and use the return of the evaluation if it exists..
         raise "Missing parameter 'room_ident'" if @options[:room_ident].empty?
+        room_ident_evaluated = context[@options[:room_ident]]
+        @options[:room_ident] = room_ident_evaluated unless room_ident_evaluated.empty?
 
         today = Date.today
         last_day = today.next_month(config['months_ahead'].to_i)
