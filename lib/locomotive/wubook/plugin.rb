@@ -56,7 +56,8 @@ module Locomotive
         # Evaluate variables and use the return of the evaluation if it exists..
         raise "Missing parameter 'room_ident'" if @options[:room_ident].empty?
         room_ident_evaluated = context[@options[:room_ident]]
-        @options[:room_ident] = room_ident_evaluated unless room_ident_evaluated.empty?
+        @options[:room_ident] = room_ident_evaluated unless room_ident_evaluated.nil? || room_ident_evaluated.empty?
+        ::Locomotive.log "**> AvailableDaysBlock room_ident: #{@options[:room_ident]}"
 
         today = Date.today
         last_day = today.next_month(config['months_ahead'].to_i)
@@ -102,13 +103,24 @@ module Locomotive
       end
 
       def render(context)
-        ::Locomotive.log "**> context: #{context.inspect}"
         @plugin_obj = context.registers[:plugin_object]
         config = @plugin_obj.config
 
+        # Evaluate variables and use the return of the evaluation if it exists..
         raise "Missing parameter 'room_ident'" if @options[:room_ident].empty?
+        room_ident_evaluated = context[@options[:room_ident]]
+        @options[:room_ident] = room_ident_evaluated unless room_ident_evaluated.nil? || room_ident_evaluated.empty?
+        ::Locomotive.log "**> AvailableDaysBlock room_ident: #{@options[:room_ident]}"
+
         raise "Missing parameter 'date_start'" if @options[:date_start].empty?
+        date_start_evaluated = context[@options[:date_start]]
+        @options[:date_start] = date_start_evaluated unless date_start_evaluated.nil? || date_start_evaluated.empty?
+        ::Locomotive.log "**> AvailableDaysBlock date_start_evaluated: #{@options[:date_start_evaluated]}"
+
         raise "Missing parameter 'date_end'" if @options[:date_end].empty?
+        date_end_evaluated = context[@options[:date_end]]
+        @options[:date_end] = date_end_evaluated unless date_end_evaluated.nil? || date_end_evaluated.empty?
+        ::Locomotive.log "**> AvailableDaysBlock date_end: #{@options[:date_end]}"
 
         start_day = Date.strptime(@options[:date_start], '%d.%m.%Y')
         last_day  = Date.strptime(@options[:date_end], '%d.%m.%Y')
@@ -166,8 +178,19 @@ module Locomotive
         config = @plugin_obj.config
 
         raise "Missing parameter 'room_ident'" if @options[:room_ident].empty?
+        room_ident_evaluated = context[@options[:room_ident]]
+        @options[:room_ident] = room_ident_evaluated unless room_ident_evaluated.nil? || room_ident_evaluated.empty?
+        ::Locomotive.log "**> AvailableDaysBlock room_ident: #{@options[:room_ident]}"
+
         raise "Missing parameter 'date_start'" if @options[:date_start].empty?
+        date_start_evaluated = context[@options[:date_start]]
+        @options[:date_start] = date_start_evaluated unless date_start_evaluated.nil? || date_start_evaluated.empty?
+        ::Locomotive.log "**> AvailableDaysBlock date_start_evaluated: #{@options[:date_start_evaluated]}"
+
         raise "Missing parameter 'date_end'" if @options[:date_end].empty?
+        date_end_evaluated = context[@options[:date_end]]
+        @options[:date_end] = date_end_evaluated unless date_end_evaluated.nil? || date_end_evaluated.empty?
+        ::Locomotive.log "**> AvailableDaysBlock date_end: #{@options[:date_end]}"
 
         start_day = Date.strptime(@options[:date_start], '%d.%m.%Y')
         last_day  = Date.strptime(@options[:date_end], '%d.%m.%Y')
