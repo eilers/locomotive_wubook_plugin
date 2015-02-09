@@ -38,7 +38,9 @@ module Locomotive
         base_room_data = fetch_room_base_data(wired, config['lcode'], @options[:room_ident])
         base_price = base_room_data[0]["price"]
 
-        room_data = request_room_data(wired, config['lcode'], @options[:room_ident], today, last_day)
+        room_data = Rails.cache.fetch(config['lcode'] + @options[:room_ident] + today.to_s + last_day.to_s + "/room_data", expires_in: 1.hours) do 
+          request_room_data(wired, config['lcode'], @options[:room_ident], today, last_day)
+        end
 
         # Create one entry for each day from now to then.. put a 1 if the day is available or 0 if not.
         (today .. last_day).each_with_index do |date, i|

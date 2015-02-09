@@ -2,7 +2,10 @@ require 'wired'
 
 module PluginHelper
         def fetch_room_base_data(wired, lcode, room_id)
-                rooms = wired.fetch_rooms(lcode)
+                rooms = Rails.cache.fetch(lcode + "/rooms", expires_in: 1.hours) do 
+                        wired.fetch_rooms(lcode)        
+                end
+                
                 filtered_room = rooms.select { |room_hash| room_hash['shortname'] == room_id }
                 ::Locomotive.log "**> Filtered rooms #{filtered_room} "
 
