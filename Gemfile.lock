@@ -1,14 +1,7 @@
-GIT
-  remote: git@git.intelligentmobiles.com:websites/wubook_wired
-  revision: b20d2f066c806ea5e669694703c9c354568e24a3
-  branch: master
-  specs:
-    wubook_wired (1.0.0)
-
 PATH
   remote: .
   specs:
-    locomotive_wubook_plugin (1.0.0)
+    locomotive_wubook_plugin (1.0.2)
       locomotive_plugins (~> 1.2)
       wubook_wired (~> 1.0)
 
@@ -56,6 +49,7 @@ GEM
     rspec-mocks (2.99.3)
     tilt (2.0.1)
     tzinfo (0.3.43)
+    wubook_wired (1.0.1)
 
 PLATFORMS
   ruby
@@ -64,4 +58,4 @@ DEPENDENCIES
   locomotive_wubook_plugin!
   mocha (~> 0.13)
   rspec (~> 2.12)
-  wubook_wired!
+  wubook_wired (~> 1.0.0)
