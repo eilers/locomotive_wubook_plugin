@@ -71,6 +71,17 @@ Returns:
     
 if the booking time frame is available.
 
+####wubook_prices
+Returns a JSON array that contains one entry for each day of the time interval defined with "Booking months ahead", starting with today. Each entry contains the price of the room. 0 means: There is no price available.
+    - room_ident: The short name of the room as defined in WuBook
+
+Example:
+
+    {% wubook_available room_ident: 'TestRoom' %};
+Returns
+    
+    [1,0,0,1]
+
 ### Liquid Filters
 
 No liquid filters are provided
