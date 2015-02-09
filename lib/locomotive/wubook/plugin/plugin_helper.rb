@@ -1,13 +1,20 @@
 require 'wired'
 
 module PluginHelper
+        def fetch_room_base_data(wired, lcode, room_id)
+                rooms = wired.fetch_rooms(lcode)
+                filtered_room = rooms.select { |room_hash| room_hash['shortname'] == room_id }
+                ::Locomotive.log "**> Filtered rooms #{filtered_room} "
+
+                filtered_room
+        end
+
         def fetch_room_id(wired, lcode, room_id)
                 # Start with finding the room-id for the room with a special name
-                rooms = wired.fetch_rooms(lcode)
-                filtered_rooms = rooms.select { |room_hash| room_hash['shortname'] == room_id }
-                ::Locomotive.log "**> Filtered rooms #{filtered_rooms} "
-                raise "Unable to find a room with identifier: #{room_id}" if filtered_rooms.length == 0
-                room_identifier = filtered_rooms[0]['id']
+                filtered_room = fetch_room_base_data(wired, lcode, room_id)
+                ::Locomotive.log "**> Filtered rooms #{filtered_room} "
+                raise "Unable to find a room with identifier: #{room_id}" if filtered_room.length == 0
+                room_identifier = filtered_room[0]['id']
                 raise "Unable to get the room id." if room_identifier == nil
 
                 room_identifier
