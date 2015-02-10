@@ -26,7 +26,12 @@ module Locomotive
         # Evaluate variables and use the return of the evaluation if it exists..
         raise "Missing parameter 'room_ident'" if @options[:room_ident].empty?
         room_ident_evaluated = context[@options[:room_ident]]
-        @options[:room_ident] = room_ident_evaluated unless room_ident_evaluated.nil? || room_ident_evaluated.empty?
+        unless room_ident_evaluated.nil? || room_ident_evaluated.empty? then
+          @options[:room_ident] = room_ident_evaluated
+        else
+          return "[]"
+        end
+
         ::Locomotive.log "**> AvailableDaysTag room_ident: #{@options[:room_ident]}"
 
         today = Date.today
@@ -39,6 +44,7 @@ module Locomotive
         base_price = base_room_data[0]["price"]
 
         room_data = Rails.cache.fetch(config['lcode'] + @options[:room_ident] + today.to_s + last_day.to_s + "/room_data", expires_in: 1.hours) do 
+          ::Locomotive.log "**> Cache fetch for key: #{config['lcode'] + @options[:room_ident] + today.to_s + last_day.to_s + "/room_data"}"
           request_room_data(wired, config['lcode'], @options[:room_ident], today, last_day)
         end
 

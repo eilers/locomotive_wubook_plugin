@@ -3,6 +3,7 @@ require 'wired'
 module PluginHelper
         def fetch_room_base_data(wired, lcode, room_id)
                 rooms = Rails.cache.fetch(lcode + "/rooms", expires_in: 1.hours) do 
+                        ::Locomotive.log "**> Cache fetch for key: #{lcode + "/rooms"}"
                         wired.fetch_rooms(lcode)        
                 end
                 
