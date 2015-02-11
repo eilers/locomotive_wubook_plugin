@@ -43,6 +43,10 @@ module Locomotive
         last_day  = @options[:date_end]
         ::Locomotive.log "**> SetAsBookedTag: Date Interval: #{start_day} - #{last_day}"
 
+        # Last day is the day of departure. It will not be marked as booked
+        last_day -= 1
+        ::Locomotive.log "**> Effective end-day: #{last_day} "
+
         wired = Wired.new(config)
         wired.aquire_token
         room_id = fetch_room_id(wired, config['lcode'], @options[:room_ident])

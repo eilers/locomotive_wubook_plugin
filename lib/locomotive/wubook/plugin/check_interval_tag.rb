@@ -43,20 +43,14 @@ module Locomotive
         last_day  = @options[:date_end]
         ::Locomotive.log "**> CheckIntervalTag: Date Interval: #{start_day} - #{last_day}"
 
+        # Last day is the day of departure. It will not be marked/handled as booked
+        last_day -= 1
+        ::Locomotive.log "**> Effective end-day: #{last_day} "
+
         wired = Wired.new(config)
         wired.aquire_token
         room_data = request_room_data(wired, config['lcode'], @options[:room_ident], start_day, last_day)
         wired.release_token
-
-        # Check whether first day is available. If this is _not_ the case we have to add one day (vacation == departure is allowed)
-        is_first_available = room_data[0]['avail'] === 1
-
-        # Check wheter the last day is not available. If this is _not_ the case we have to reduce one day (vacation == departure is allowed)
-        is_last_available = room_data[last_day.mjd - start_day.mjd]['avail'] === 1
-
-        # Remove the first or last day from the array.
-        room_data.shift  unless is_first_available # Remove first element
-        room_data[0..-1] unless is_last_available  # Remove last element
 
         # Now check the (modified) interval regarding availability
         is_available = true
